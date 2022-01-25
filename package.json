@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "yarn netlify dev",
-    "lint:fix": "yarn eslint packages/**/src/**/*.(t|j)s script/*.(t|j)s --fix"
+    "lint:fix": "yarn eslint packages/**/src/**/*.(t|j)s script/*.(t|j)s --fix",
+    "build:frontend": "yarn parcel build packages/frontend/src/index.html --dist-dir ./dist"
   },
   "devDependencies": {
     "@tophat/eslint-config": "^2.0.0",
