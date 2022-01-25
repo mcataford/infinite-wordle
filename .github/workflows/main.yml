@@ -26,7 +26,7 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          yarn netlify deploy --dir=dist > output.log
+          yarn netlify deploy > output.log
           echo "::set-output name=draft-url::$(grep 'Website Draft URL' output.log)"
       - name: Report
         if: ${{ github.ref != 'refs/heads/main' }}
@@ -48,5 +48,5 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          yarn netlify deploy --dir=dist --prod
+          yarn netlify deploy --prod
 
