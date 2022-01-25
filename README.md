@@ -1,1 +1,1 @@
-# infinite-wordle
+# wordle

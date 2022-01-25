@@ -1,0 +1,9 @@
+{
+    "name": "backend",
+    "private": true,
+    "dependencies": {
+        "@netlify/functions": "^0.10.0",
+        "@shared/types": "workspace:packages/types",
+        "sqlite3": "^5.0.2"
+    }
+}
