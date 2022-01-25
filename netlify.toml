@@ -1,0 +1,6 @@
+[dev]
+    command = "yarn parcel serve packages/frontend/src/index.html"
+
+[functions]
+    directory = "packages/backend/src/"
+    included_files = ["puzzles.sqlite"]
