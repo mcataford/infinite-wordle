@@ -22,6 +22,7 @@ jobs:
       - name: Build dictionary
         env:
           DICTIONARY_TAG: rev_22-01-2022-22-04
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release download --repo mcataford/words ${{ env.DICTIONARY_TAG }}
           yarn ts-node script/buildDictionary.ts
