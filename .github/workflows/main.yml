@@ -1,0 +1,52 @@
+name: Publish
+
+on:
+  push:
+    branches: main
+  pull_request:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        id: node-setup
+        with:
+          node-version: 16
+      - name: Install
+        run: yarn
+      - name: Build
+        run: yarn build:frontend
+      - name: Deploy preview
+        if: ${{ github.ref != 'refs/heads/main' }}
+        id: preview-deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          yarn netlify deploy --dir=dist > output.log
+          echo "::set-output name=draft-url::$(grep 'Website Draft URL' output.log)"
+      - name: Report
+        if: ${{ github.ref != 'refs/heads/main' }}
+        uses: actions/github-script@v2
+        env:
+          DRAFT_URL: ${{ steps.preview-deploy.outputs.draft-url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `:eyes: Branch deployed at ${process.env.DRAFT_URL}`
+            })
+      - name: Deploy
+        if: ${{ github.ref == 'refs/heads/main' }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          yarn netlify deploy --dir=dist --prod
+
