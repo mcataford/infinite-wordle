@@ -19,6 +19,12 @@ jobs:
         run: yarn
       - name: Build
         run: yarn build:frontend
+      - name: Build dictionary
+        env:
+          DICTIONARY_TAG: rev_22-01-2022-22-04
+        run: |
+          gh release download --repo mcataford/words ${{ env.DICTIONARY_TAG }}
+          yarn ts-node script/buildDictionary.ts
       - name: Deploy preview
         if: ${{ github.ref != 'refs/heads/main' }}
         id: preview-deploy

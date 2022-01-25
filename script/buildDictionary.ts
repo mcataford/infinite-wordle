@@ -37,7 +37,7 @@ async function getDictionarySource(
     console.info(`Inserted ${queries.length} records (${dbEnd} ms)`)
     console.groupEnd()
 }
-const WORD_LIST = './dictionary.txt'
+const WORD_LIST = './dictionary_common.txt'
 const DATABASE_PATH = './puzzles.sqlite'
 
 getDictionarySource(WORD_LIST, DATABASE_PATH).catch((e) => {
