@@ -6,19 +6,73 @@ on:
   pull_request:
 
 jobs:
-  publish:
+  setup:
     runs-on: ubuntu-latest
-    name: Publish
+    name: Setup
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - uses: actions/cache@v2
+        id: dep-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+      - name: Install
+        if: steps.dep-cache.outputs.cache-hit != 'true'
+        run: yarn 
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    needs: setup
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         id: node-setup
         with:
           node-version: 16
-      - name: Install
-        run: yarn
+      - uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+      - name: Lint
+        run: yarn lint
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    name: Build frontend
+    needs: setup
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        id: node-setup
+        with:
+          node-version: 16
+      - uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: Build
         run: yarn build:frontend
+      - uses: actions/upload-artifact@v2
+        with:
+          name: frontend-dist
+          path: dist
+  build-dictionary:
+    runs-on: ubuntu-latest
+    name: Build dictionary
+    needs: setup
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        id: node-setup
+        with:
+          node-version: 16
+      - uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: Build dictionary
         env:
           DICTIONARY_TAG: rev_22-01-2022-22-04
@@ -26,6 +80,31 @@ jobs:
         run: |
           gh release download --repo mcataford/words ${{ env.DICTIONARY_TAG }}
           yarn ts-node script/buildDictionary.ts
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dictionary
+          path: puzzles.sqlite
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish
+    needs: [lint, build-frontend, build-dictionary]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        id: node-setup
+        with:
+          node-version: 16
+      - uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: frontend-dist
+          path: dist
+      - uses: actions/download-artifact@v2
+        with:
+          name: dictionary
       - name: Deploy preview
         if: ${{ github.ref != 'refs/heads/main' }}
         id: preview-deploy
@@ -33,8 +112,8 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          yarn netlify deploy > output.log
-          echo "::set-output name=draft-url::$(grep 'Website Draft URL' output.log)"
+          yarn netlify deploy --json | jq '.deploy_url' -r > deploy_url.txt
+          echo "::set-output name=draft-url::$(cat deploy_url.txt)"
       - name: Report
         if: ${{ github.ref != 'refs/heads/main' }}
         uses: actions/github-script@v2
