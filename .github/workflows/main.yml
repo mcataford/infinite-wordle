@@ -112,8 +112,8 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          yarn netlify deploy > output.log
-          echo "::set-output name=draft-url::$(grep 'Website Draft URL' output.log)"
+          yarn netlify deploy --json | jq '.deploy_url' -r > deploy_url.txt
+          echo "::set-output name=draft-url::$(cat deploy_url.txt)"
       - name: Report
         if: ${{ github.ref != 'refs/heads/main' }}
         uses: actions/github-script@v2
