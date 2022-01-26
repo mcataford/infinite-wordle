@@ -36,8 +36,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-      - name: Install
-        run: yarn
       - name: Build
         run: yarn build:frontend
       - uses: actions/upload-artifact@v2
@@ -58,8 +56,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-      - name: Install
-        run: yarn
       - name: Build dictionary
         env:
           DICTIONARY_TAG: rev_22-01-2022-22-04
@@ -85,8 +81,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-      - name: Install
-        run: yarn
       - uses: actions/download-artifact@v2
         with:
           name: frontend-dist
