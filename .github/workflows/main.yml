@@ -84,10 +84,11 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: frontend-dist
+          path: dist
       - uses: actions/download-artifact@v2
         with:
           name: dictionary
-      - name: Deploy previewi
+      - name: Deploy preview
         if: ${{ github.ref != 'refs/heads/main' }}
         id: preview-deploy
         env:
