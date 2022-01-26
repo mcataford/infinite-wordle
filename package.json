@@ -9,6 +9,7 @@
   "scripts": {
     "start": "yarn netlify dev",
     "lint:fix": "yarn eslint packages/**/src/**/*.(t|j)s script/*.(t|j)s --fix",
+    "lint": "yarn eslint packages/**/src/**/*.(t|j)s script/*.(t|j)s",
     "build:frontend": "yarn parcel build packages/frontend/src/index.html --dist-dir ./dist"
   },
   "devDependencies": {
