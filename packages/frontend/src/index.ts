@@ -29,12 +29,12 @@ function draw(state: GameState) {
     cellTable.id = 'game-grid'
     for (let height = 0; height < state.puzzleSize; height++) {
         const row = document.createElement('div')
-        row.className = "row"
+        row.className = 'row'
         const currentWord = letters.length > 0 ? letters.shift() : []
 
         for (let width = 0; width < state.puzzleSize; width++) {
             const cell = document.createElement('div')
-            cell.className = "cell"
+            cell.className = 'cell'
 
             if (width < currentWord.length) {
                 const cellData = currentWord[width]
